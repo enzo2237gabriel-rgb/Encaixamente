@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agendar Consulta — Encaixamente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --creme:#faf7f2;--areia:#f0e8dc;--terracota:#b5614a;
+    --marrom:#6b4c3b;--escuro:#2e1f18;--verde:#5a7a5e;--cinza:#9e9089;
+  }
+  * { margin:0;padding:0;box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif;background:var(--creme);color:var(--escuro);min-height:100vh; }
+
+  nav {
+    position:fixed;top:0;width:100%;z-index:100;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:20px 60px;
+    background:rgba(250,247,242,0.92);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(107,76,59,0.08);
+  }
+  .logo { font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--marrom);text-decoration:none; }
+  .logo span { color:var(--terracota); }
+
+  .page-wrap {
+    padding-top:100px;
+    min-height:100vh;
+    display:grid;
+    grid-template-columns:1fr 1.2fr;
+  }
+
+  .sidebar {
+    background:var(--escuro);
+    padding:60px 50px;
+    position:sticky;top:80px;height:calc(100vh - 80px);
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .sidebar-tag {
+    font-size:11px;letter-spacing:3px;text-transform:uppercase;
+    color:var(--terracota);margin-bottom:20px;
+  }
+  .sidebar h2 {
+    font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:300;
+    color:var(--areia);line-height:1.15;margin-bottom:24px;
+  }
+  .sidebar h2 em { font-style:italic;color:var(--terracota); }
+  .sidebar p { font-size:14px;color:rgba(255,255,255,0.4);line-height:1.8;font-weight:300;margin-bottom:32px; }
+
+  .info-items { display:flex;flex-direction:column;gap:20px; }
+  .info-item { display:flex;align-items:flex-start;gap:14px; }
+  .info-icon {
+    width:36px;height:36px;background:rgba(181,97,74,0.15);border-radius:8px;
+    display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;
+  }
+  .info-label { font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px; }
+  .info-value { font-size:13px;color:rgba(255,255,255,0.7); }
+
+  .form-area {
+    padding:60px 70px;
+    overflow-y:auto;
+  }
+
+  /* STEPPER */
+  .stepper {
+    display:flex;align-items:center;gap:0;margin-bottom:48px;
+  }
+  .step {
+    display:flex;align-items:center;gap:10px;
+    padding:0 16px;
+    cursor:pointer;
+  }
+  .step:first-child { padding-left:0; }
+  .step-num {
+    width:32px;height:32px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:500;
+    border:2px solid rgba(107,76,59,0.2);
+    color:var(--cinza);
+    transition:all 0.3s;
+    flex-shrink:0;
+  }
+  .step.active .step-num { background:var(--terracota);border-color:var(--terracota);color:white; }
+  .step.done .step-num { background:var(--verde);border-color:var(--verde);color:white; }
+  .step-label { font-size:12px;color:var(--cinza);transition:color 0.3s; }
+  .step.active .step-label { color:var(--terracota);font-weight:500; }
+  .step.done .step-label { color:var(--verde); }
+  .step-line { flex:1;height:1px;background:rgba(107,76,59,0.15); }
+
+  /* FORM STEPS */
+  .form-step { display:none; }
+  .form-step.active { display:block;animation:fadeIn 0.3s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateX(16px)} to{opacity:1;transform:translateX(0)} }
+
+  .step-title {
+    font-family:'Cormorant Garamond',serif;
+    font-size:30px;font-weight:300;margin-bottom:8px;
+  }
+  .step-desc { font-size:13px;color:var(--cinza);margin-bottom:36px;font-weight:300; }
+
+  .field { margin-bottom:24px; }
+  label { display:block;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza);margin-bottom:8px;font-weight:400; }
+  input, textarea, select {
+    width:100%;border:1px solid rgba(107,76,59,0.18);background:white;
+    border-radius:10px;padding:13px 16px;font-size:14px;font-family:'DM Sans',sans-serif;
+    color:var(--escuro);outline:none;transition:border 0.2s;
+  }
+  input:focus, textarea:focus { border-color:var(--terracota); }
+  textarea { resize:vertical;min-height:90px; }
+  .field-row { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+
+  /* CALENDÁRIO CUSTOMIZADO */
+  .calendar-wrap { margin-bottom:24px; }
+  .cal-header {
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .cal-month {
+    font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;
+    color:var(--marrom);
+  }
+  .cal-nav {
+    background:none;border:1px solid rgba(107,76,59,0.2);
+    width:32px;height:32px;border-radius:50%;cursor:pointer;
+    color:var(--cinza);font-size:14px;transition:all 0.2s;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .cal-nav:hover { background:var(--terracota);color:white;border-color:var(--terracota); }
+  .cal-grid { display:grid;grid-template-columns:repeat(7,1fr);gap:4px; }
+  .cal-dow {
+    text-align:center;font-size:11px;letter-spacing:1px;
+    color:var(--cinza);padding:8px 0;text-transform:uppercase;
+  }
+  .cal-day {
+    aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+    border-radius:8px;font-size:13px;cursor:pointer;
+    transition:all 0.2s;border:2px solid transparent;
+    color:var(--escuro);
+  }
+  .cal-day:hover:not(.disabled):not(.empty) { background:var(--areia); }
+  .cal-day.today { color:var(--terracota);font-weight:600; }
+  .cal-day.selected { background:var(--terracota);color:white;border-color:var(--terracota); }
+  .cal-day.disabled { color:rgba(107,76,59,0.2);cursor:not-allowed; }
+  .cal-day.empty { cursor:default; }
+  .cal-day.no-attend { color:rgba(107,76,59,0.25);cursor:not-allowed;text-decoration:line-through; }
+
+  /* HORÁRIOS */
+  .horarios-grid {
+    display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;
+  }
+  .hor-btn {
+    background:white;border:1.5px solid rgba(107,76,59,0.2);
+    color:var(--marrom);padding:10px 18px;border-radius:8px;
+    font-size:13px;cursor:pointer;transition:all 0.2s;
+    font-family:'DM Sans',sans-serif;font-weight:400;
+  }
+  .hor-btn:hover { background:var(--areia); }
+  .hor-btn.selected { background:var(--terracota);color:white;border-color:var(--terracota); }
+  .hor-loading { font-size:13px;color:var(--cinza);font-style:italic; }
+
+  /* BOTÕES */
+  .btn-row { display:flex;gap:12px;margin-top:32px; }
+  .btn-next {
+    background:var(--terracota);color:white;border:none;
+    padding:14px 36px;border-radius:50px;font-size:14px;
+    font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;
+    transition:all 0.2s;
+  }
+  .btn-next:hover { background:var(--marrom);transform:translateY(-1px); }
+  .btn-back {
+    background:none;color:var(--cinza);border:1px solid rgba(107,76,59,0.2);
+    padding:14px 28px;border-radius:50px;font-size:14px;
+    font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.2s;
+  }
+  .btn-back:hover { border-color:var(--marrom);color:var(--marrom); }
+
+  /* CONFIRMAÇÃO */
+  .confirm-card {
+    background:var(--areia);border-radius:16px;padding:32px;margin-bottom:24px;
+  }
+  .confirm-row {
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 0;border-bottom:1px solid rgba(107,76,59,0.1);
+    font-size:14px;
+  }
+  .confirm-row:last-child { border-bottom:none; }
+  .confirm-key { color:var(--cinza);font-size:12px;text-transform:uppercase;letter-spacing:1px; }
+  .confirm-val { color:var(--escuro);font-weight:500; }
+
+  /* SUCESSO */
+  .success-wrap { text-align:center;padding:40px 0; }
+  .success-icon {
+    width:80px;height:80px;background:rgba(90,122,94,0.1);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:36px;margin:0 auto 24px;
+  }
+  .success-id {
+    display:inline-block;background:var(--areia);
+    border-radius:8px;padding:8px 20px;font-size:14px;
+    font-weight:600;letter-spacing:2px;color:var(--marrom);
+    margin:12px 0 24px;
+  }
+  .error-msg {
+    background:#fde8e8;border:1px solid #f5a5a5;color:#c0392b;
+    border-radius:8px;padding:10px 14px;font-size:13px;margin-top:8px;
+    display:none;
+  }
+
+  @media(max-width:768px){
+    .page-wrap{grid-template-columns:1fr;}
+    .sidebar{display:none;}
+    .form-area{padding:40px 24px;}
+    nav{padding:16px 24px;}
+    .field-row{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo">Encaixam<span>e</span>nte</a>
+</nav>
+
+<div class="page-wrap">
+  <div class="sidebar">
+    <div class="sidebar-tag">Agendamento online</div>
+    <h2>Agende sua<br><em>consulta</em></h2>
+    <p>Preencha o formulário e receba a confirmação. A psicanalista será notificada imediatamente.</p>
+    <div class="info-items">
+      <div class="info-item">
+        <div class="info-icon">💼</div>
+        <div>
+          <div class="info-label">Psicanalista</div>
+          <div class="info-value" id="sidebar-psi">{{ psianalista }}</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">⏱️</div>
+        <div>
+          <div class="info-label">Duração</div>
+          <div class="info-value" id="sidebar-dur">{{ config.duracao_consulta_min }} minutos</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">💰</div>
+        <div>
+          <div class="info-label">Valor</div>
+          <div class="info-value" id="sidebar-val">{{ config.valor_consulta }}</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">🔒</div>
+        <div>
+          <div class="info-label">Privacidade</div>
+          <div class="info-value">Seus dados são protegidos e sigilosos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-area">
+    <!-- STEPPER -->
+    <div class="stepper">
+      <div class="step active" data-step="1"><div class="step-num">1</div><div class="step-label">Dados</div></div>
+      <div class="step-line"></div>
+      <div class="step" data-step="2"><div class="step-num">2</div><div class="step-label">Data</div></div>
+      <div class="step-line"></div>
+      <div class="step" data-step="3"><div class="step-num">3</div><div class="step-label">Confirmação</div></div>
+    </div>
+
+    <!-- STEP 1: Dados pessoais -->
+    <div class="form-step active" id="step-1">
+      <div class="step-title">Seus dados</div>
+      <div class="step-desc">Precisamos de algumas informações básicas para o agendamento.</div>
+      <div class="field"><label>Nome completo *</label><input type="text" id="nome" placeholder="Seu nome completo"></div>
+      <div class="field-row">
+        <div class="field"><label>E-mail *</label><input type="email" id="email" placeholder="seu@email.com"></div>
+        <div class="field"><label>Telefone *</label><input type="tel" id="telefone" placeholder="(00) 00000-0000"></div>
+      </div>
+      <div class="field">
+        <label>Motivo (opcional)</label>
+        <textarea id="motivo" placeholder="Fique à vontade para descrever brevemente o motivo da consulta..."></textarea>
+      </div>
+      <div class="error-msg" id="err-1">Por favor, preencha todos os campos obrigatórios.</div>
+      <div class="btn-row">
+        <button class="btn-next" onclick="goStep(2)">Próximo →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Data e horário -->
+    <div class="form-step" id="step-2">
+      <div class="step-title">Escolha a data</div>
+      <div class="step-desc">Selecione um dia disponível e o horário de preferência.</div>
+
+      <div class="calendar-wrap">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="calNav(-1)">‹</button>
+          <div class="cal-month" id="cal-month"></div>
+          <button class="cal-nav" onclick="calNav(1)">›</button>
+        </div>
+        <div class="cal-grid" id="cal-dows"></div>
+        <div class="cal-grid" id="cal-days"></div>
+      </div>
+
+      <div class="field">
+        <label>Horários disponíveis</label>
+        <div id="horarios-container"><p class="hor-loading">Selecione uma data para ver os horários.</p></div>
+      </div>
+      <div class="error-msg" id="err-2">Selecione uma data e horário.</div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="goStep(1)">← Voltar</button>
+        <button class="btn-next" onclick="goStep(3)">Revisar →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Confirmação -->
+    <div class="form-step" id="step-3">
+      <div class="step-title">Confirmar agendamento</div>
+      <div class="step-desc">Revise seus dados antes de confirmar.</div>
+      <div class="confirm-card" id="confirm-summary"></div>
+      <div class="error-msg" id="err-3">Ocorreu um erro. Tente novamente.</div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="goStep(2)">← Voltar</button>
+        <button class="btn-next" id="btn-confirmar" onclick="confirmar()">✓ Confirmar consulta</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Sucesso -->
+    <div class="form-step" id="step-4">
+      <div class="success-wrap">
+        <div class="success-icon">✅</div>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:300;">Consulta agendada!</h2>
+        <p style="color:var(--cinza);font-size:14px;margin:12px 0;">Seu ID de agendamento:</p>
+        <div class="success-id" id="success-id">—</div>
+        <p style="color:var(--cinza);font-size:13px;max-width:360px;margin:0 auto 32px;line-height:1.8;">
+          Guarde este ID para consultar ou cancelar sua consulta. A psicanalista foi notificada e entrará em contato.
+        </p>
+        <a href="/" style="background:var(--terracota);color:white;padding:14px 32px;border-radius:50px;text-decoration:none;font-size:14px;">Voltar ao início</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Detecta se está rodando com Flask ou direto no navegador ──
+const IS_FLASK = !window.location.protocol.startsWith('file');
+
+// Horários padrão para modo standalone (sem Flask)
+const HORARIOS_PADRAO = {
+  segunda: ['09:00','10:00','11:00','14:00','15:00','16:00','17:00'],
+  terca:   ['09:00','10:00','11:00','14:00','15:00','16:00','17:00'],
+  quarta:  ['09:00','10:00','11:00','14:00','15:00','16:00','17:00'],
+  quinta:  ['09:00','10:00','11:00','14:00','15:00','16:00','17:00'],
+  sexta:   ['09:00','10:00','11:00','14:00','15:00'],
+};
+
+// Corrige sidebar se variáveis Jinja não foram processadas
+(function fixSidebar() {
+  const psi = document.getElementById('sidebar-psi');
+  const dur = document.getElementById('sidebar-dur');
+  const val = document.getElementById('sidebar-val');
+  if (psi && psi.textContent.includes('{{')) psi.textContent = 'Psicanalista';
+  if (dur && dur.textContent.includes('{{')) dur.textContent = '50 minutos';
+  if (val && val.textContent.includes('{{')) val.textContent = 'A consultar';
+})();
+
+let currentStep = 1;
+let selectedDate = '';
+let selectedHorario = '';
+const attendDays = ['segunda','terca','quarta','quinta','sexta'];
+const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+let calYear, calMonth;
+
+function getDayKey(dow) {
+  return ['domingo','segunda','terca','quarta','quinta','sexta','sabado'][dow];
+}
+
+function initCal() {
+  const now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
+  // Cabeçalho dos dias da semana
+  const dows = document.getElementById('cal-dows');
+  dows.innerHTML = '';
+  ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dow';
+    el.textContent = d;
+    dows.appendChild(el);
+  });
+  renderCal();
+}
+
+function renderCal() {
+  document.getElementById('cal-month').textContent = monthNames[calMonth] + ' ' + calYear;
+  const grid = document.getElementById('cal-days');
+  grid.innerHTML = '';
+  const first = new Date(calYear, calMonth, 1);
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  // Células vazias antes do primeiro dia
+  for (let i = 0; i < first.getDay(); i++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day empty';
+    grid.appendChild(el);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(calYear, calMonth, d);
+    const dow = date.getDay();
+    const dayKey = getDayKey(dow);
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    el.textContent = d;
+
+    if (date < today) {
+      el.classList.add('disabled');
+    } else if (!attendDays.includes(dayKey)) {
+      el.classList.add('no-attend');
+    } else {
+      if (date.toDateString() === today.toDateString()) el.classList.add('today');
+      el.onclick = () => selectDate(dateStr, el);
+    }
+    if (dateStr === selectedDate) el.classList.add('selected');
+    grid.appendChild(el);
+  }
+}
+
+function calNav(dir) {
+  calMonth += dir;
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0;  calYear++; }
+  renderCal();
+}
+
+async function selectDate(dateStr, el) {
+  selectedDate = dateStr;
+  selectedHorario = '';
+  document.querySelectorAll('.cal-day.selected').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+
+  const container = document.getElementById('horarios-container');
+  container.innerHTML = '<p class="hor-loading">Carregando horários...</p>';
+
+  let horarios = [];
+
+  if (IS_FLASK) {
+    try {
+      const r = await fetch(`/api/horarios?data=${dateStr}`);
+      const data = await r.json();
+      horarios = data.horarios || [];
+    } catch(e) {
+      // fallback para modo standalone se fetch falhar
+      horarios = getHorariosStandalone(dateStr);
+    }
+  } else {
+    horarios = getHorariosStandalone(dateStr);
+  }
+
+  if (!horarios.length) {
+    container.innerHTML = '<p class="hor-loading">Nenhum horário disponível para este dia.</p>';
+    return;
+  }
+
+  const gridEl = document.createElement('div');
+  gridEl.className = 'horarios-grid';
+  horarios.forEach(h => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'hor-btn';
+    btn.textContent = h;
+    btn.onclick = () => {
+      selectedHorario = h;
+      document.querySelectorAll('.hor-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    };
+    gridEl.appendChild(btn);
+  });
+  container.innerHTML = '';
+  container.appendChild(gridEl);
+}
+
+function getHorariosStandalone(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  const dayKey = getDayKey(d.getDay());
+  return HORARIOS_PADRAO[dayKey] || [];
+}
+
+function goStep(n) {
+  if (n > currentStep) {
+    if (currentStep === 1) {
+      const nome  = document.getElementById('nome').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const tel   = document.getElementById('telefone').value.trim();
+      if (!nome || !email || !tel || !email.includes('@')) {
+        document.getElementById('err-1').style.display = 'block';
+        return;
+      }
+      document.getElementById('err-1').style.display = 'none';
+    }
+    if (currentStep === 2) {
+      if (!selectedDate || !selectedHorario) {
+        document.getElementById('err-2').style.display = 'block';
+        return;
+      }
+      document.getElementById('err-2').style.display = 'none';
+      buildSummary();
+    }
+  }
+  document.getElementById('step-' + currentStep).classList.remove('active');
+  document.getElementById('step-' + n).classList.add('active');
+  document.querySelectorAll('.step').forEach(s => {
+    const sn = parseInt(s.dataset.step);
+    s.classList.remove('active','done');
+    if (sn === n) s.classList.add('active');
+    if (sn < n)  s.classList.add('done');
+  });
+  currentStep = n;
+}
+
+function buildSummary() {
+  const meses = ['','janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const dias  = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  const d = new Date(selectedDate + 'T12:00:00');
+  const dataFmt = `${dias[d.getDay()]}, ${d.getDate()} de ${meses[d.getMonth()+1]} de ${d.getFullYear()}`;
+  const rows = [
+    ['Nome',     document.getElementById('nome').value],
+    ['E-mail',   document.getElementById('email').value],
+    ['Telefone', document.getElementById('telefone').value],
+    ['Data',     dataFmt],
+    ['Horário',  selectedHorario],
+    ['Motivo',   document.getElementById('motivo').value || '—'],
+  ];
+  document.getElementById('confirm-summary').innerHTML = rows.map(([k,v]) =>
+    `<div class="confirm-row"><span class="confirm-key">${k}</span><span class="confirm-val">${v}</span></div>`
+  ).join('');
+}
+
+async function confirmar() {
+  const btn = document.getElementById('btn-confirmar');
+  btn.disabled = true;
+  btn.textContent = 'Aguarde...';
+
+  if (!IS_FLASK) {
+    // Modo demo — simula sucesso sem servidor
+    setTimeout(() => {
+      const fakeId = Math.random().toString(36).substr(2,8).toUpperCase();
+      document.getElementById('success-id').textContent = fakeId;
+      document.querySelector('.stepper').style.display = 'none';
+      goStep(4);
+    }, 800);
+    return;
+  }
+
+  const payload = {
+    nome:     document.getElementById('nome').value,
+    email:    document.getElementById('email').value,
+    telefone: document.getElementById('telefone').value,
+    data:     selectedDate,
+    horario:  selectedHorario,
+    motivo:   document.getElementById('motivo').value
+  };
+
+  try {
+    const r = await fetch('/api/agendar', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await r.json();
+    if (data.ok) {
+      document.getElementById('success-id').textContent = data.id;
+      document.querySelector('.stepper').style.display = 'none';
+      goStep(4);
+    } else {
+      document.getElementById('err-3').textContent = data.msg || 'Erro ao agendar.';
+      document.getElementById('err-3').style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = '✓ Confirmar consulta';
+    }
+  } catch(e) {
+    document.getElementById('err-3').textContent = 'Erro de conexão. Verifique se o servidor está rodando.';
+    document.getElementById('err-3').style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = '✓ Confirmar consulta';
+  }
+}
+
+// Inicia o calendário na etapa 2 (não na 1 — só inicializa ao navegar)
+initCal();
+</script>
+</body>
+</html>

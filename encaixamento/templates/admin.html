@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Admin — Encaixamente</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--creme:#faf7f2;--areia:#f0e8dc;--terracota:#b5614a;--marrom:#6b4c3b;--escuro:#2e1f18;--verde:#5a7a5e;--cinza:#9e9089;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:#f5f5f7;color:var(--escuro);min-height:100vh;}
+  .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh;}
+  
+  .sidebar{background:var(--escuro);padding:28px 20px;display:flex;flex-direction:column;gap:4px;}
+  .admin-logo{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--areia);margin-bottom:32px;padding:0 8px;}
+  .admin-logo span{color:var(--terracota);}
+  .nav-item{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;
+    color:rgba(255,255,255,0.4);font-size:13px;cursor:pointer;transition:all 0.2s;
+    text-decoration:none;
+  }
+  .nav-item:hover,.nav-item.active{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.85);}
+  .nav-item.active{color:var(--terracota);}
+
+  .main{padding:32px;overflow-y:auto;}
+  .page-header{margin-bottom:28px;}
+  .page-header h1{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--escuro);}
+  .page-header p{font-size:13px;color:var(--cinza);margin-top:4px;}
+
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+  .stat-card{background:white;border-radius:12px;padding:20px 24px;}
+  .stat-card .num{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--terracota);line-height:1;}
+  .stat-card .lbl{font-size:12px;color:var(--cinza);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px;}
+
+  .section-card{background:white;border-radius:12px;padding:24px;margin-bottom:20px;}
+  .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+  .card-title{font-size:15px;font-weight:500;color:var(--escuro);}
+
+  table{width:100%;border-collapse:collapse;}
+  th{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);padding:0 16px 12px;text-align:left;border-bottom:1px solid rgba(107,76,59,0.08);}
+  td{padding:14px 16px;font-size:13px;border-bottom:1px solid rgba(107,76,59,0.05);}
+  tr:last-child td{border-bottom:none;}
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:500;}
+  .badge-ok{background:rgba(90,122,94,0.1);color:var(--verde);}
+  .badge-cancel{background:rgba(181,97,74,0.1);color:var(--terracota);}
+
+  /* CONFIG */
+  .config-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .cf{display:flex;flex-direction:column;gap:6px;}
+  .cf label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);}
+  .cf input,.cf select{border:1px solid rgba(107,76,59,0.18);background:var(--creme);border-radius:8px;padding:10px 12px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--escuro);outline:none;transition:border 0.2s;}
+  .cf input:focus{border-color:var(--terracota);}
+  .btn-save{background:var(--terracota);color:white;border:none;padding:12px 28px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background 0.2s;margin-top:20px;}
+  .btn-save:hover{background:var(--marrom);}
+  .save-ok{display:none;background:rgba(90,122,94,0.1);color:var(--verde);border-radius:6px;padding:8px 12px;font-size:12px;margin-top:10px;}
+
+  .tab-btns{display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid rgba(107,76,59,0.1);padding-bottom:0;}
+  .tab-btn{background:none;border:none;padding:10px 16px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;color:var(--cinza);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.2s;}
+  .tab-btn.active{color:var(--terracota);border-bottom-color:var(--terracota);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="sidebar">
+    <div class="admin-logo">Encaix<span>a</span>mento</div>
+    <a href="#" class="nav-item active" onclick="showTab('agenda')">📅 Agenda</a>
+    <a href="#" class="nav-item" onclick="showTab('config')">⚙️ Configurações</a>
+    <a href="/" class="nav-item" style="margin-top:auto;">← Voltar ao site</a>
+  </nav>
+
+  <main class="main">
+    <div class="page-header">
+      <h1>Painel Admin</h1>
+      <p>Gerencie agendamentos e configurações da clínica.</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="num">{{ agendamentos|length }}</div>
+        <div class="lbl">Próximas consultas</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">{{ total }}</div>
+        <div class="lbl">Total de agendamentos</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">{{ config.valor_consulta }}</div>
+        <div class="lbl">Valor por sessão</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">{{ config.duracao_consulta_min }}'</div>
+        <div class="lbl">Duração da sessão</div>
+      </div>
+    </div>
+
+    <div id="tab-agenda" class="tab-panel active">
+      <div class="section-card">
+        <div class="card-header">
+          <div class="card-title">Próximas consultas agendadas</div>
+        </div>
+        {% if agendamentos %}
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Cliente</th><th>Data</th><th>Horário</th><th>Telefone</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in agendamentos %}
+            <tr>
+              <td><strong>{{ a.id }}</strong></td>
+              <td>
+                <div style="font-weight:500;">{{ a.nome }}</div>
+                <div style="font-size:12px;color:var(--cinza);">{{ a.email }}</div>
+              </td>
+              <td>{{ a.data_formatada }}</td>
+              <td>{{ a.horario }}</td>
+              <td>{{ a.telefone }}</td>
+              <td>
+                <span class="badge {% if a.status == 'confirmado' %}badge-ok{% else %}badge-cancel{% endif %}">
+                  {% if a.status == 'confirmado' %}✓ Confirmado{% else %}✕ Cancelado{% endif %}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p style="text-align:center;color:var(--cinza);padding:40px;font-size:14px;">Nenhuma consulta agendada ainda.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div id="tab-config" class="tab-panel">
+      <div class="section-card">
+        <div class="card-header"><div class="card-title">Configurações da clínica</div></div>
+        <div class="config-grid">
+          <div class="cf"><label>Nome da clínica</label><input type="text" id="cfg-clinica" value="{{ config.clinica_nome }}"></div>
+          <div class="cf"><label>Nome da psicanalista</label><input type="text" id="cfg-psi" value="{{ psianalista }}"></div>
+          <div class="cf"><label>Valor da consulta</label><input type="text" id="cfg-valor" value="{{ config.valor_consulta }}"></div>
+          <div class="cf"><label>Duração (minutos)</label><input type="number" id="cfg-dur" value="{{ config.duracao_consulta_min }}"></div>
+        </div>
+
+        <div style="margin-top:28px;margin-bottom:12px;font-size:13px;font-weight:500;color:var(--marrom);">📱 Notificações por WhatsApp (Twilio)</div>
+        <p style="font-size:12px;color:var(--cinza);margin-bottom:12px;">Crie uma conta em <a href="https://www.twilio.com" target="_blank" style="color:var(--terracota)">twilio.com</a> e ative o sandbox do WhatsApp.</p>
+        <div class="config-grid">
+          <div class="cf"><label>Account SID</label><input type="text" id="cfg-tw-sid" placeholder="ACxxxxxxxxxxxxxxxx" value="{{ config.twilio_account_sid }}"></div>
+          <div class="cf"><label>Auth Token</label><input type="password" id="cfg-tw-tok" placeholder="••••••••••••••••"></div>
+          <div class="cf"><label>Número Twilio (from)</label><input type="text" id="cfg-tw-from" placeholder="whatsapp:+14155238886" value="{{ config.twilio_whatsapp_from }}"></div>
+          <div class="cf"><label>WhatsApp da psicanalista (to)</label><input type="text" id="cfg-tw-to" placeholder="whatsapp:+5585999999999" value="{{ config.twilio_whatsapp_to }}"></div>
+        </div>
+
+        <div style="margin-top:28px;margin-bottom:12px;font-size:13px;font-weight:500;color:var(--marrom);">📧 Notificações por E-mail</div>
+        <div class="config-grid">
+          <div class="cf"><label>E-mail remetente (Gmail)</label><input type="email" id="cfg-email-de" placeholder="clinica@gmail.com" value="{{ config.email_remetente }}"></div>
+          <div class="cf"><label>Senha de app Gmail</label><input type="password" id="cfg-email-senha" placeholder="••••••••••••••••"></div>
+          <div class="cf"><label>E-mail da psicanalista (destino)</label><input type="email" id="cfg-email-para" placeholder="psicanálista@email.com" value="{{ config.email_destinatario }}"></div>
+        </div>
+
+        <div style="margin-top:28px;margin-bottom:12px;font-size:13px;font-weight:500;color:var(--marrom);">📱 Notificações por Telegram</div>
+        <div class="config-grid">
+          <div class="cf"><label>Token do bot Telegram</label><input type="text" id="cfg-tg-token" placeholder="123456789:ABCDEF..." value="{{ config.telegram_bot_token }}"></div>
+          <div class="cf"><label>Chat ID da psicanalista</label><input type="text" id="cfg-tg-chat" placeholder="-100000000" value="{{ config.telegram_chat_id }}"></div>
+        </div>
+
+        <button class="btn-save" onclick="saveConfig()">Salvar configurações</button>
+        <div class="save-ok" id="save-ok">✓ Configurações salvas!</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+async function saveConfig() {
+  const payload = {
+    clinica_nome: document.getElementById('cfg-clinica').value,
+    'psianalista_nome': document.getElementById('cfg-psi').value,
+    valor_consulta: document.getElementById('cfg-valor').value,
+    duracao_consulta_min: parseInt(document.getElementById('cfg-dur').value),
+    twilio_account_sid: document.getElementById('cfg-tw-sid').value,
+    twilio_whatsapp_from: document.getElementById('cfg-tw-from').value,
+    twilio_whatsapp_to: document.getElementById('cfg-tw-to').value,
+    email_remetente: document.getElementById('cfg-email-de').value,
+    email_destinatario: document.getElementById('cfg-email-para').value,
+    telegram_bot_token: document.getElementById('cfg-tg-token').value,
+    telegram_chat_id: document.getElementById('cfg-tg-chat').value,
+  };
+  const twTok = document.getElementById('cfg-tw-tok').value;
+  if (twTok) payload.twilio_auth_token = twTok;
+  const senha = document.getElementById('cfg-email-senha').value;
+  if (senha) payload.email_senha = senha;
+
+  const r = await fetch('/api/config', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  });
+  if ((await r.json()).ok) {
+    const ok = document.getElementById('save-ok');
+    ok.style.display='block';
+    setTimeout(() => ok.style.display='none', 3000);
+  }
+}
+</script>
+</body>
+</html>
