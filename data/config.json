@@ -1,0 +1,60 @@
+{
+  "clinica_nome": "Encaixamente",
+  "psianalista_nome": "Dra. Ana Silva",
+  "email_remetente": "",
+  "email_senha": "",
+  "email_destinatario": "",
+  "telegram_bot_token": "",
+  "telegram_chat_id": "",
+  "twilio_account_sid": "",
+  "twilio_auth_token": "",
+  "twilio_whatsapp_from": "whatsapp:+14155238886",
+  "twilio_whatsapp_to": "",
+  "horarios_disponiveis": {
+    "segunda": [
+      "09:00",
+      "10:00",
+      "11:00",
+      "14:00",
+      "15:00",
+      "16:00",
+      "17:00"
+    ],
+    "terca": [
+      "09:00",
+      "10:00",
+      "11:00",
+      "14:00",
+      "15:00",
+      "16:00",
+      "17:00"
+    ],
+    "quarta": [
+      "09:00",
+      "10:00",
+      "11:00",
+      "14:00",
+      "15:00",
+      "16:00",
+      "17:00"
+    ],
+    "quinta": [
+      "09:00",
+      "10:00",
+      "11:00",
+      "14:00",
+      "15:00",
+      "16:00",
+      "17:00"
+    ],
+    "sexta": [
+      "09:00",
+      "10:00",
+      "11:00",
+      "14:00",
+      "15:00"
+    ]
+  },
+  "duracao_consulta_min": 50,
+  "valor_consulta": "R$ 150,00"
+}
