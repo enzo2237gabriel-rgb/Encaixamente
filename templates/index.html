@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encaixamente — Clínica de Psicanálise</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --creme: #faf7f2;
+    --areia: #f0e8dc;
+    --terracota: #b5614a;
+    --marrom: #6b4c3b;
+    --escuro: #2e1f18;
+    --verde: #5a7a5e;
+    --cinza: #9e9089;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--creme);
+    color: var(--escuro);
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 60px;
+    background: rgba(250,247,242,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(107,76,59,0.08);
+  }
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--marrom);
+    letter-spacing: 1px;
+    text-decoration: none;
+  }
+  .logo span { color: var(--terracota); }
+  nav ul { list-style: none; display: flex; gap: 36px; }
+  nav a {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--cinza);
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: var(--marrom); }
+  .btn-nav {
+    background: var(--terracota);
+    color: white !important;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    transition: background 0.2s, transform 0.15s !important;
+  }
+  .btn-nav:hover { background: var(--marrom) !important; transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 80px;
+  }
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 60px 80px 80px;
+  }
+  .hero-tag {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--terracota);
+    margin-bottom: 24px;
+    position: relative;
+    padding-left: 32px;
+  }
+  .hero-tag::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 50%;
+    width: 20px; height: 1px;
+    background: var(--terracota);
+  }
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(48px, 5vw, 76px);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--escuro);
+    margin-bottom: 28px;
+  }
+  h1 em {
+    font-style: italic;
+    color: var(--terracota);
+  }
+  .hero-desc {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--cinza);
+    max-width: 420px;
+    margin-bottom: 40px;
+    font-weight: 300;
+  }
+  .hero-btns { display: flex; gap: 16px; align-items: center; }
+  .btn-primary {
+    background: var(--terracota);
+    color: white;
+    padding: 14px 32px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .btn-primary:hover { background: var(--marrom); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(107,76,59,0.2); }
+  .btn-outline {
+    color: var(--marrom);
+    font-size: 14px;
+    font-weight: 400;
+    text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+    transition: gap 0.2s;
+  }
+  .btn-outline:hover { gap: 12px; }
+  .btn-outline::after { content: '→'; }
+
+  .hero-right {
+    position: relative;
+    background: var(--areia);
+    overflow: hidden;
+  }
+  .hero-right::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(181,97,74,0.08);
+  }
+  .hero-right::after {
+    content: '';
+    position: absolute;
+    bottom: 60px; left: 40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(90,122,94,0.08);
+  }
+  .hero-visual {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    text-align: center;
+  }
+  .hero-circle {
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(181,97,74,0.15), rgba(107,76,59,0.1));
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+    position: relative;
+  }
+  .hero-circle-inner {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 80px;
+    font-style: italic;
+    color: var(--terracota);
+    opacity: 0.6;
+  }
+  .orbit {
+    position: absolute;
+    border: 1px solid rgba(181,97,74,0.2);
+    border-radius: 50%;
+    animation: spin 20s linear infinite;
+  }
+  .orbit-1 { width: 320px; height: 320px; top: -30px; left: -30px; }
+  .orbit-2 { width: 380px; height: 380px; top: -60px; left: -60px; animation-direction: reverse; animation-duration: 30s; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* STATS */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid rgba(107,76,59,0.1);
+    border-bottom: 1px solid rgba(107,76,59,0.1);
+  }
+  .stat {
+    padding: 32px 48px;
+    text-align: center;
+    border-right: 1px solid rgba(107,76,59,0.1);
+  }
+  .stat:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 300;
+    color: var(--terracota);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label { font-size: 12px; color: var(--cinza); letter-spacing: 1px; text-transform: uppercase; }
+
+  /* SOBRE */
+  .section { padding: 100px 80px; }
+  .section-tag {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--terracota);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .section-tag::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--terracota);
+  }
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 3.5vw, 54px);
+    font-weight: 300;
+    line-height: 1.15;
+    margin-bottom: 24px;
+  }
+  .sobre-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .sobre-texto p {
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--cinza);
+    margin-bottom: 20px;
+    font-weight: 300;
+  }
+  .sobre-card {
+    background: var(--areia);
+    border-radius: 24px;
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .sobre-card::before {
+    content: '"';
+    position: absolute;
+    top: -10px; left: 24px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 140px;
+    color: rgba(181,97,74,0.1);
+    line-height: 1;
+  }
+  .quote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--marrom);
+    position: relative;
+    z-index: 1;
+  }
+  .quote-autor {
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--cinza);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    position: relative; z-index: 1;
+  }
+
+  /* SERVIÇOS */
+  .servicos { background: var(--escuro); padding: 100px 80px; }
+  .servicos h2 { color: var(--areia); }
+  .servicos .section-tag { color: var(--terracota); }
+  .servicos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 56px;
+  }
+  .servico-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 40px 36px;
+    transition: all 0.3s;
+    cursor: default;
+  }
+  .servico-card:hover {
+    background: rgba(255,255,255,0.07);
+    border-color: rgba(181,97,74,0.3);
+    transform: translateY(-4px);
+  }
+  .servico-icon {
+    width: 48px; height: 48px;
+    background: rgba(181,97,74,0.15);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    margin-bottom: 24px;
+  }
+  .servico-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--areia);
+    margin-bottom: 12px;
+  }
+  .servico-card p { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.8; font-weight: 300; }
+
+  /* BOT */
+  .bot-section { padding: 100px 80px; background: var(--areia); }
+  .bot-container {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+  }
+  .bot-info h2 { color: var(--escuro); }
+  .bot-info p { font-size: 14px; color: var(--cinza); line-height: 1.8; margin-top: 16px; font-weight: 300; }
+
+  .chat-widget {
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 24px 64px rgba(46,31,24,0.12);
+    height: 520px;
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-header {
+    background: var(--marrom);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .chat-avatar {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .chat-header-info { flex: 1; }
+  .chat-header-name { font-size: 13px; color: white; font-weight: 500; }
+  .chat-header-status { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .chat-dot { width: 8px; height: 8px; background: #5edb7a; border-radius: 50%; }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--areia); border-radius: 2px; }
+
+  .msg {
+    max-width: 82%;
+    animation: msgIn 0.3s ease;
+  }
+  @keyframes msgIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  .msg-bot { align-self: flex-start; }
+  .msg-user { align-self: flex-end; }
+  .msg-bubble {
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .msg-bot .msg-bubble {
+    background: var(--areia);
+    color: var(--escuro);
+    border-bottom-left-radius: 4px;
+  }
+  .msg-user .msg-bubble {
+    background: var(--terracota);
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+  .msg-bubble strong { font-weight: 600; }
+
+  .chat-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 20px 12px;
+  }
+  .opt-btn {
+    background: white;
+    border: 1px solid rgba(181,97,74,0.3);
+    color: var(--marrom);
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .opt-btn:hover { background: var(--terracota); color: white; border-color: var(--terracota); }
+
+  .chat-input-area {
+    border-top: 1px solid rgba(107,76,59,0.08);
+    padding: 12px 16px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  #chat-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--escuro);
+    background: transparent;
+  }
+  #chat-input::placeholder { color: var(--cinza); }
+  .chat-send {
+    width: 36px; height: 36px;
+    background: var(--terracota);
+    border: none;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: white;
+    font-size: 14px;
+  }
+  .chat-send:hover { background: var(--marrom); }
+
+  /* DATA PICKER no chat */
+  .date-picker-wrapper, .horarios-wrapper {
+    padding: 0 20px 12px;
+  }
+  .date-picker-wrapper input {
+    width: 100%;
+    border: 1px solid rgba(181,97,74,0.3);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--escuro);
+    background: white;
+    outline: none;
+  }
+  .date-picker-wrapper input:focus { border-color: var(--terracota); }
+  .horarios-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .hor-btn {
+    background: white;
+    border: 1px solid rgba(181,97,74,0.3);
+    color: var(--marrom);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .hor-btn:hover { background: var(--terracota); color: white; }
+
+  /* TYPING INDICATOR */
+  .typing { display: flex; align-items: center; gap: 4px; padding: 10px 14px; background: var(--areia); border-radius: 16px; border-bottom-left-radius: 4px; width: fit-content; }
+  .typing span { width: 6px; height: 6px; background: var(--cinza); border-radius: 50%; animation: bounce 1s infinite; }
+  .typing span:nth-child(2) { animation-delay: 0.15s; }
+  .typing span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+  /* CTA */
+  .cta { padding: 100px 80px; text-align: center; background: var(--creme); }
+  .cta h2 { max-width: 600px; margin: 0 auto 32px; }
+  .cta p { font-size: 15px; color: var(--cinza); max-width: 400px; margin: 0 auto 40px; font-weight: 300; line-height: 1.8; }
+
+  /* FOOTER */
+  footer {
+    background: var(--escuro);
+    padding: 48px 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--areia);
+    font-weight: 400;
+  }
+  footer p { font-size: 12px; color: rgba(255,255,255,0.3); }
+  footer a { color: rgba(255,255,255,0.3); text-decoration: none; font-size: 12px; transition: color 0.2s; }
+  footer a:hover { color: var(--terracota); }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    nav ul { display: none; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .hero-left { padding: 40px 24px; }
+    .section, .servicos, .bot-section, .cta { padding: 60px 24px; }
+    .sobre-grid, .servicos-grid, .bot-container { grid-template-columns: 1fr; }
+    .stats-bar { grid-template-columns: 1fr; }
+    .stat { border-right: none; border-bottom: 1px solid rgba(107,76,59,0.1); }
+    footer { flex-direction: column; gap: 16px; padding: 32px 24px; text-align: center; }
+  }
+
+  /* Animações de entrada */
+  [data-animate] { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  [data-animate].visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">Encaix<span>a</span>mento</a>
+  <ul>
+    <li><a href="#sobre">Sobre</a></li>
+    <li><a href="#servicos">Atendimento</a></li>
+    <li><a href="#bot">Assistente</a></li>
+    <li><a href="/agendar" class="btn-nav">Agendar consulta</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <span class="hero-tag">Clínica de Psicanálise</span>
+    <h1>Um espaço<br>para se <em>encontrar</em></h1>
+    <p class="hero-desc">A psicanálise oferece um espaço seguro e acolhedor para explorar suas experiências internas, com escuta qualificada e presença humana.</p>
+    <div class="hero-btns">
+      <a href="/agendar" class="btn-primary">Agendar consulta</a>
+      <a href="#bot" class="btn-outline">Falar com assistente</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-visual">
+      <div class="hero-circle">
+        <div class="orbit orbit-1"></div>
+        <div class="orbit orbit-2"></div>
+        <span class="hero-circle-inner">ψ</span>
+      </div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--marrom);font-style:italic;">{{ psianalista }}</div>
+      <div style="font-size:12px;color:var(--cinza);margin-top:4px;letter-spacing:1px;text-transform:uppercase;">Psicanalista</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat" data-animate>
+    <div class="stat-num">{{ config.valor_consulta }}</div>
+    <div class="stat-label">Valor da sessão</div>
+  </div>
+  <div class="stat" data-animate>
+    <div class="stat-num">{{ config.duracao_consulta_min }}'</div>
+    <div class="stat-label">Duração da consulta</div>
+  </div>
+  <div class="stat" data-animate>
+    <div class="stat-num">5×</div>
+    <div class="stat-label">Dias de atendimento</div>
+  </div>
+</div>
+
+<!-- SOBRE -->
+<section class="section" id="sobre">
+  <div class="sobre-grid">
+    <div class="sobre-texto" data-animate>
+      <div class="section-tag">Sobre a clínica</div>
+      <h2>Encaixamente — onde palavras <em>encontram</em> espaço</h2>
+      <p>A psicanálise é uma prática de escuta profunda, que permite ao sujeito elaborar seus conflitos, sintomas e questões existenciais através da fala.</p>
+      <p>Na Encaixamente, oferecemos um espaço de acolhimento, sigilo e presença, onde cada pessoa pode se descobrir em sua singularidade.</p>
+      <a href="/agendar" class="btn-primary" style="display:inline-block;margin-top:8px;">Dar o primeiro passo</a>
+    </div>
+    <div class="sobre-card" data-animate>
+      <p class="quote">"A escuta psicanalítica não julga — ela cria o espaço para que o inconsciente possa falar."</p>
+      <p class="quote-autor">— {{ psianalista }}</p>
+    </div>
+  </div>
+</section>
+
+<!-- SERVIÇOS -->
+<section class="servicos" id="servicos">
+  <div class="section-tag">Atendimento</div>
+  <h2 style="color:var(--areia);">Como posso <em style="color:var(--terracota)">ajudar</em></h2>
+  <div class="servicos-grid">
+    <div class="servico-card" data-animate>
+      <div class="servico-icon">🧠</div>
+      <h3>Psicanálise individual</h3>
+      <p>Sessões individuais com foco no autoconhecimento, elaboração de conflitos e bem-estar emocional.</p>
+    </div>
+    <div class="servico-card" data-animate>
+      <div class="servico-icon">🌱</div>
+      <h3>Ansiedade e depressão</h3>
+      <p>Acompanhamento especializado para questões relacionadas à ansiedade, tristeza, burnout e esgotamento emocional.</p>
+    </div>
+    <div class="servico-card" data-animate>
+      <div class="servico-icon">💬</div>
+      <h3>Relações e vínculos</h3>
+      <p>Trabalho sobre padrões relacionais, dificuldades afetivas, conflitos interpessoais e dinâmicas familiares.</p>
+    </div>
+  </div>
+</section>
+
+<!-- BOT -->
+<section class="bot-section" id="bot">
+  <div class="bot-container">
+    <div class="bot-info" data-animate>
+      <div class="section-tag">Assistente virtual</div>
+      <h2>Agende com nossa <em>assistente</em></h2>
+      <p>Nossa assistente virtual está disponível para responder dúvidas, verificar disponibilidades e agendar sua consulta de forma simples e rápida.</p>
+      <p style="margin-top:12px;">Após o agendamento, a {{ psianalista }} receberá uma notificação com seus dados.</p>
+    </div>
+
+    <div class="chat-widget" id="chat-widget">
+      <div class="chat-header">
+        <div class="chat-avatar">🌿</div>
+        <div class="chat-header-info">
+          <div class="chat-header-name">Assistente Encaixamente</div>
+          <div class="chat-header-status">Online</div>
+        </div>
+        <div class="chat-dot"></div>
+      </div>
+      <div class="chat-messages" id="chat-msgs"></div>
+      <div id="chat-extras"></div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Escreva uma mensagem..." autocomplete="off">
+        <button class="chat-send" onclick="sendMsg()">➤</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="section-tag" style="justify-content:center;">Primeiro passo</div>
+  <h2 data-animate>Pronto para <em>começar</em> sua jornada?</h2>
+  <p data-animate>Agende uma consulta e dê início a um processo de autoconhecimento e cuidado emocional.</p>
+  <a href="/agendar" class="btn-primary" data-animate>Agendar minha consulta</a>
+</section>
+
+<footer>
+  <div>
+    <div class="footer-logo">Encaixamente</div>
+    <p style="margin-top:4px;">Clínica de Psicanálise</p>
+  </div>
+  <p>© 2024 Encaixamente. Todos os direitos reservados.</p>
+  <a href="/admin">Painel admin</a>
+</footer>
+
+<script>
+const SESSION_ID = 'sess_' + Math.random().toString(36).substr(2,9);
+let botState = 'inicio';
+
+function renderText(t) {
+  return t.replace(/\*(.*?)\*/g,'<strong>$1</strong>');
+}
+
+function addMsg(text, isBot) {
+  const msgs = document.getElementById('chat-msgs');
+  const d = document.createElement('div');
+  d.className = 'msg msg-' + (isBot ? 'bot' : 'user');
+  d.innerHTML = `<div class="msg-bubble">${renderText(text)}</div>`;
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('chat-msgs');
+  const t = document.createElement('div');
+  t.className = 'msg msg-bot';
+  t.id = 'typing-indicator';
+  t.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  msgs.appendChild(t);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function hideTyping() {
+  const t = document.getElementById('typing-indicator');
+  if (t) t.remove();
+}
+
+function setOptions(opcoes) {
+  const extras = document.getElementById('chat-extras');
+  extras.innerHTML = '';
+  if (!opcoes || !opcoes.length) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'chat-options';
+  opcoes.forEach(op => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = op;
+    btn.onclick = () => {
+      setOptions([]);
+      sendMsg(op);
+    };
+    wrap.appendChild(btn);
+  });
+  extras.appendChild(wrap);
+}
+
+function showDatePicker() {
+  const extras = document.getElementById('chat-extras');
+  extras.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'date-picker-wrapper';
+  const input = document.createElement('input');
+  input.type = 'date';
+  const hoje = new Date();
+  hoje.setDate(hoje.getDate() + 1);
+  input.min = hoje.toISOString().split('T')[0];
+  input.onchange = () => {
+    const val = input.value;
+    if (!val) return;
+    extras.innerHTML = '';
+    sendMsg(val, val);
+  };
+  wrap.appendChild(input);
+  extras.appendChild(wrap);
+}
+
+async function showHorarios(data) {
+  const extras = document.getElementById('chat-extras');
+  extras.innerHTML = '';
+  const r = await fetch(`/api/horarios?data=${data}`);
+  const json = await r.json();
+  if (!json.horarios || !json.horarios.length) {
+    addMsg('Nenhum horário disponível para este dia. Por favor, escolha outra data.', true);
+    showDatePicker();
+    return;
+  }
+  const wrap = document.createElement('div');
+  wrap.style.padding = '0 20px 12px';
+  const grid = document.createElement('div');
+  grid.className = 'horarios-grid';
+  json.horarios.forEach(h => {
+    const btn = document.createElement('button');
+    btn.className = 'hor-btn';
+    btn.textContent = h;
+    btn.onclick = () => {
+      extras.innerHTML = '';
+      sendMsg(h);
+    };
+    grid.appendChild(btn);
+  });
+  wrap.appendChild(grid);
+  extras.appendChild(wrap);
+}
+
+async function sendMsg(texto, display) {
+  const input = document.getElementById('chat-input');
+  const msg = texto || input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  setOptions([]);
+  addMsg(display || msg, false);
+  showTyping();
+  try {
+    const r = await fetch('/api/bot', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({session_id: SESSION_ID, mensagem: msg})
+    });
+    const data = await r.json();
+    hideTyping();
+    setTimeout(() => {
+      addMsg(data.resposta, true);
+      if (data.acao === 'mostrar_data') {
+        showDatePicker();
+      } else if (data.acao === 'mostrar_horarios') {
+        showHorarios(data.data);
+      } else {
+        setOptions(data.opcoes);
+      }
+    }, 200);
+  } catch(e) {
+    hideTyping();
+    addMsg('Erro de conexão. Tente novamente.', true);
+  }
+}
+
+document.getElementById('chat-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendMsg();
+});
+
+// Init
+setTimeout(() => sendMsg('oi'), 500);
+
+// Scroll animations
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold: 0.1});
+document.querySelectorAll('[data-animate]').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
